@@ -3,17 +3,22 @@ import { View, TouchableNativeFeedback, SafeAreaView } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import MapView, { Polygon } from "react-native-maps";
 import { getBeachData, getDefaultRegion } from "../../api/api";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 import { styles } from "./styles";
 import BeachDetailView from "./overlay/BeachDetailView";
 import WelcomeDetailView from "./overlay/WelcomeDetailView";
+import * as Location from 'expo-location';
 
 const MapsView = ({ route }) => {
   const [region, setRegion] = useState(getDefaultRegion());
   const [navIndex, setNavIndex] = useState(null);
   const [welcomeMesIsDisplayed, setWelcomeMessageOverlay] = useState(true);
   const [beachIsDisplayed, setBeachOverlay] = useState(false);
+
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
 
   const mapRef = useRef(null);
   const beachRef = useRef(null);
@@ -219,7 +224,26 @@ const MapsView = ({ route }) => {
     }
   };
 
+  const getLocation = () => {
+    // console.log('before', location)
+    if(!location) {
+      (async () => {
+        let { status } = await Location.requestPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
+  
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+        setRegion(location.coords);
+      })();
+    }
+  };
+  
   useFocusEffect(() => {
+    getLocation();
+
     if (route.params) {
       updatePolygonStrokeColour(route.params.region.id - 1);
       setRegion(route.params.region);
@@ -256,7 +280,7 @@ const MapsView = ({ route }) => {
         <PolygonViews></PolygonViews>
       </MapView>
       <AnimatedCard />
-      <WelcomeViewCard />
+      {/* <WelcomeViewCard /> */}
       <Pagination navIndex={navIndex}></Pagination>
     </SafeAreaView>
   );
