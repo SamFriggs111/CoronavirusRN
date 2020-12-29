@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
-import { View, TouchableNativeFeedback, SafeAreaView } from "react-native";
+import { View, TouchableNativeFeedback, SafeAreaView, Text } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
-import MapView, { Polygon } from "react-native-maps";
+import MapView, { Polygon, Marker, Callout } from "react-native-maps";
 import { getBeachData, getDefaultRegion } from "../../api/api";
-import { useFocusEffect, useEffect } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 import { styles } from "./styles";
 import BeachDetailView from "./overlay/BeachDetailView";
@@ -225,7 +225,6 @@ const MapsView = ({ route }) => {
   };
 
   const getLocation = () => {
-    // console.log('before', location)
     if(!location) {
       (async () => {
         let { status } = await Location.requestPermissionsAsync();
@@ -278,8 +277,15 @@ const MapsView = ({ route }) => {
         ref={mapRef}
       >
         <PolygonViews></PolygonViews>
+        <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }}>
+          <Callout style={{flex: 1, position: 'relative'}}>
+            <View>
+              <Text>My Location</Text>
+            </View>
+          </Callout>
+        </Marker>
       </MapView>
-      <AnimatedCard />
+      {/* <AnimatedCard /> */}
       {/* <WelcomeViewCard /> */}
       <Pagination navIndex={navIndex}></Pagination>
     </SafeAreaView>
