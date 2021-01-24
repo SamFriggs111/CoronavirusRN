@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { View, TouchableNativeFeedback, SafeAreaView, Text } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import MapView, { Polygon, Marker, Callout } from "react-native-maps";
-import { getBeachData, getDefaultRegion } from "../../api/api";
+import { getBeachData, getDefaultRegion, getHelpText } from "../../api/api";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 import { styles } from "./styles";
@@ -18,7 +18,6 @@ const MapsView = ({ route }) => {
 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-
 
   const mapRef = useRef(null);
   const beachRef = useRef(null);
@@ -195,6 +194,19 @@ const MapsView = ({ route }) => {
     );
   };
 
+  const MarkerLocations = () => {
+    const locations = getHelpText();
+    return locations.map((data) => (
+      <Marker coordinate={{ latitude: parseFloat(data.lat), longitude: parseFloat(data.lng) }}>
+        <Callout style={{flex: 1, position: 'relative'}}>
+          <View>
+            <Text>{data.city}</Text>
+          </View>
+        </Callout>
+      </Marker>
+    ));
+  };
+
   const closeWindow = () => {
     updatePolygonStrokeColour(null);
     if (beachIsDisplayed) {
@@ -284,7 +296,9 @@ const MapsView = ({ route }) => {
             </View>
           </Callout>
         </Marker>
+        <MarkerLocations />
       </MapView>
+      
       {/* <AnimatedCard /> */}
       {/* <WelcomeViewCard /> */}
       <Pagination navIndex={navIndex}></Pagination>
