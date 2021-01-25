@@ -1,20 +1,37 @@
-import React, { useRef, useState } from "react";
-import { View, TouchableNativeFeedback, SafeAreaView, Text } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
+import {
+  View,
+  TouchableNativeFeedback,
+  SafeAreaView,
+  ActivityIndicator,
+  Text
+} from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import MapView, { Polygon, Marker, Callout } from "react-native-maps";
-import { getBeachData, getDefaultRegion, getHelpText } from "../../api/api";
+import {
+  getBeachData,
+  getDefaultRegion,
+  getHelpText,
+  Tester
+} from "../../api/api";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 import { styles } from "./styles";
 import BeachDetailView from "./overlay/BeachDetailView";
 import WelcomeDetailView from "./overlay/WelcomeDetailView";
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
 
 const MapsView = ({ route }) => {
   const [region, setRegion] = useState(getDefaultRegion());
   const [navIndex, setNavIndex] = useState(null);
   const [welcomeMesIsDisplayed, setWelcomeMessageOverlay] = useState(true);
   const [beachIsDisplayed, setBeachOverlay] = useState(false);
+  const [beachResults, setResults] = useState(false);
+
+  const locations = getHelpText();
+  const [locationCovidInformation, setLocationCovidInformation] = useState(
+    locations
+  );
 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -27,15 +44,17 @@ const MapsView = ({ route }) => {
 
   const beachData = getBeachData();
 
-  const switchToBeach = (key) => {
+  
+
+  const switchToBeach = key => {
     setRegion(beachData[key - 1]);
     setNavIndex(beachData[key - 1].id - 1);
     setWelcomeMessageOverlay(false);
     updatePolygonStrokeColour(key - 1);
   };
 
-  const updatePolygonStrokeColour = (key) => {
-    beachData.forEach((index) =>
+  const updatePolygonStrokeColour = key => {
+    beachData.forEach(index =>
       setBeachOverlay((beachData[index.id - 1].strokeColour = null))
     );
     if (key || key == 0) {
@@ -45,7 +64,7 @@ const MapsView = ({ route }) => {
   };
 
   const PolygonViews = () => {
-    return beachData.map((data) => (
+    return beachData.map(data => (
       <Polygon
         ref={polyRef}
         key={data.id}
@@ -71,7 +90,7 @@ const MapsView = ({ route }) => {
                     styles.paginationDot,
                     navIndex === key
                       ? styles.paginationDotActive
-                      : styles.paginationDotInactive,
+                      : styles.paginationDotInactive
                   ]}
                 />
               );
@@ -194,13 +213,52 @@ const MapsView = ({ route }) => {
     );
   };
 
+  const Tester = location => {
+    // console.log("loc", location);
+    setResults(false);
+    // console.log("on press");
+    fetch(
+      `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=" +
+        ${location}
+        &structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`
+    )
+      .then(results => results.json())
+      .then(data => {
+        // console.log("data", data.data[0].newCasesByPublishDate);
+        // console.log("data", data.data);
+        let caseInformation = locationCovidInformation.findIndex(
+          obj => obj.city == location
+        );
+        locations[caseInformation].newCases =
+          data.data[0].newCasesByPublishDate;
+        console.log("info", locations[caseInformation]);
+        setLocationCovidInformation(locations);
+        setResults(true);
+      });
+  };
+
   const MarkerLocations = () => {
-    const locations = getHelpText();
-    return locations.map((data) => (
-      <Marker coordinate={{ latitude: parseFloat(data.lat), longitude: parseFloat(data.lng) }}>
-        <Callout style={{flex: 1, position: 'relative'}}>
+    // const locations = getHelpText();
+    return locationCovidInformation.map(data => (
+      <Marker
+        onPress={() => Tester(data.city)}
+        coordinate={{
+          latitude: parseFloat(data.lat),
+          longitude: parseFloat(data.lng)
+        }}
+      >
+        <Callout style={{ flex: 1, position: "relative" }}>
           <View>
-            <Text>{data.city}</Text>
+            {beachResults ? (
+              <View>
+                <Text>{data.city}</Text>
+                <Text>New Cases: {data.newCases}</Text>
+              </View>
+            ) : (
+              <View>
+                <Text>Loading Latest Data</Text>
+              </View>
+            )}
           </View>
         </Callout>
       </Marker>
@@ -237,21 +295,21 @@ const MapsView = ({ route }) => {
   };
 
   const getLocation = () => {
-    if(!location) {
+    if (!location) {
       (async () => {
         let { status } = await Location.requestPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
           return;
         }
-  
+
         let location = await Location.getCurrentPositionAsync({});
         setLocation(location);
         setRegion(location.coords);
       })();
     }
   };
-  
+
   useFocusEffect(() => {
     getLocation();
 
@@ -268,7 +326,7 @@ const MapsView = ({ route }) => {
           latitude: region.latitude,
           longitude: region.longitude,
           latitudeDelta: 0.017,
-          longitudeDelta: 0.017,
+          longitudeDelta: 0.017
         },
         2000
       );
@@ -284,13 +342,18 @@ const MapsView = ({ route }) => {
           latitude: region.latitude,
           longitude: region.longitude,
           latitudeDelta: 0.017,
-          longitudeDelta: 0.017,
+          longitudeDelta: 0.017
         }}
         ref={mapRef}
       >
         <PolygonViews></PolygonViews>
-        <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }}>
-          <Callout style={{flex: 1, position: 'relative'}}>
+        <Marker
+          coordinate={{
+            latitude: region.latitude,
+            longitude: region.longitude
+          }}
+        >
+          <Callout style={{ flex: 1, position: "relative" }}>
             <View>
               <Text>My Location</Text>
             </View>
@@ -298,7 +361,7 @@ const MapsView = ({ route }) => {
         </Marker>
         <MarkerLocations />
       </MapView>
-      
+
       {/* <AnimatedCard /> */}
       {/* <WelcomeViewCard /> */}
       <Pagination navIndex={navIndex}></Pagination>
