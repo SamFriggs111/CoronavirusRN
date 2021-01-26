@@ -55,11 +55,3 @@ export const getNoticeText = () => {
       Desc: "All updates will be displayed here"
     };
 };
-
-async function getLocationData() {
-  return "TESREE";
-}
-
-export const getCongestion = () => {
-  return "TESREE";
-};

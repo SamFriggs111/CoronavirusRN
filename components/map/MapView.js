@@ -192,7 +192,7 @@ const MapsView = ({ route }) => {
             ref={welcomeRef}
             style={[styles.slide, styles.carousel]}
           >
-            <TouchableNativeFeedback
+            {/* <TouchableNativeFeedback
               underlayColor="white"
               onPress={() => changeBeachDirection(null, 9)}
             >
@@ -202,9 +202,9 @@ const MapsView = ({ route }) => {
                 size={54}
                 color="white"
               />
-            </TouchableNativeFeedback>
+            </TouchableNativeFeedback> */}
             <WelcomeDetailView />
-            <TouchableNativeFeedback
+            {/* <TouchableNativeFeedback
               underlayColor="white"
               onPress={() => changeBeachDirection(null, 10)}
             >
@@ -214,28 +214,35 @@ const MapsView = ({ route }) => {
                 size={54}
                 color="white"
               />
-            </TouchableNativeFeedback>
+            </TouchableNativeFeedback> */}
           </Animatable.View>
         ) : null}
       </View>
     );
   };
 
-  const requestData = (location, code) => {
+  const requestData = location => {
     setResults(false);
-    let url = code
-      ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${code}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`
-      : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${location}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`;
+    let url = location.areaCode
+      ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${location.areaCode}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`
+      : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${location.city}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`;
+
     fetch(url)
       .then(results => results.json())
       .then(data => {
         let caseInformation = locationCovidInformation.findIndex(
-          obj => obj.city == location
+          obj => obj.city == location.city
         );
+
         locationCovidInformation[caseInformation].newCases =
           data.data[0].newCasesByPublishDate;
-        console.log("info", locationCovidInformation[caseInformation]);
         setLocationCovidInformation(locationCovidInformation);
+        // setRegion({
+        //   latitude: location.lat,
+        //   longitude: location.lng,
+        //   latitudeDelta: 0.017,
+        //   longitudeDelta: 0.017
+        // });
         setResults(true);
       });
   };
@@ -246,9 +253,7 @@ const MapsView = ({ route }) => {
       return locationCovidInformation.map(data => (
         <Marker
           key={data.id}
-          onPress={() =>
-            requestData(data.city, data.areaCode ? data.areaCode : null)
-          }
+          onPress={() => requestData(data)}
           coordinate={{
             latitude: parseFloat(data.lat),
             longitude: parseFloat(data.lng)
@@ -302,7 +307,7 @@ const MapsView = ({ route }) => {
     }
   };
 
-  const getLocation = () => {
+  const getMyLocation = () => {
     if (!location) {
       (async () => {
         let { status } = await Location.requestPermissionsAsync();
@@ -321,9 +326,8 @@ const MapsView = ({ route }) => {
   const getLocationData = () => {
     if (!locationCovidInformation) {
       (async () => {
-        console.log("testerx", locationCovidInformation);
         let output = [];
-        const dbh = firebase
+        firebase
           .firestore()
           .collection("locations")
           .get()
@@ -338,8 +342,8 @@ const MapsView = ({ route }) => {
   };
 
   useFocusEffect(() => {
-    // getLocationData();
-    getLocation();
+    console.log("useFocusEffect");
+    getMyLocation();
 
     if (route.params) {
       updatePolygonStrokeColour(route.params.region.id - 1);
@@ -349,15 +353,15 @@ const MapsView = ({ route }) => {
     }
     if (mapRef.current) {
       route.params = null;
-      mapRef.current.animateToRegion(
-        {
-          latitude: region.latitude,
-          longitude: region.longitude,
-          latitudeDelta: 0.017,
-          longitudeDelta: 0.017
-        },
-        2000
-      );
+      // mapRef.current.animateToRegion(
+      //   {
+      //     latitude: region.latitude,
+      //     longitude: region.longitude,
+      //     latitudeDelta: 0.017,
+      //     longitudeDelta: 0.017
+      //   },
+      //   2000
+      // );
       setNavIndex(region.id - 1);
     }
   }, []);

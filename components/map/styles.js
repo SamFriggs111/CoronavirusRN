@@ -98,7 +98,10 @@ export const styles = StyleSheet.create({
   },
   sliders: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    marginVertical: 10,
+    marginHorizontal: 25
+    // backgroundColor: "red"
   },
   sliderArrow: {
     margin: 15
@@ -114,8 +117,8 @@ export const welcomeMessage = StyleSheet.create({
     fontSize: 16
   },
   slideDesc: {
-    paddingVertical: 10,
-    width: 200,
+    padding: 20,
+    // width: 200,
     textAlign: "center",
     fontSize: 13
   },
