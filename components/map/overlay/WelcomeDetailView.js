@@ -6,7 +6,7 @@ import { styles, welcomeMessage } from "../styles";
 
 const CongestionTextView = () => {
   const congestion = getCongestion();
-  return congestion.map((warning) => (
+  return congestion.map(warning => (
     <View
       key={warning.id}
       style={[welcomeMessage.congestionView, welcomeMessage.textPadding]}
@@ -32,7 +32,7 @@ const WelcomeDetailView = () => {
       <View style={welcomeMessage.warning}>
         <Text style={welcomeMessage.signal}>{welcomeData[2]}</Text>
       </View>
-      <CongestionTextView />
+      {/* <CongestionTextView /> */}
     </View>
   );
 };

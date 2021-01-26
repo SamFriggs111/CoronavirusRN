@@ -15,8 +15,7 @@ var firebaseConfig = {
   measurementId: "G-GGEEDZZPSN"
 };
 
-// if (!firebase)
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
 import {
   View,
@@ -39,17 +38,10 @@ const MapsView = ({ route }) => {
   const [navIndex, setNavIndex] = useState(null);
   const [welcomeMesIsDisplayed, setWelcomeMessageOverlay] = useState(true);
   const [beachIsDisplayed, setBeachOverlay] = useState(false);
-  const [beachResults, setResults] = useState(false);
-
-  // const locations = getCongestion();
+  const [locationResults, setResults] = useState(false);
   const [locationCovidInformation, setLocationCovidInformation] = useState(
     null
   );
-  // console.log("tester", locations);
-  // locations.forEach(documentSnapshot => {
-  //   console.log("Location: ", documentSnapshot.data());
-  //   // output.push(documentSnapshot.data());
-  // });
 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -229,62 +221,53 @@ const MapsView = ({ route }) => {
     );
   };
 
-  const requestData = location => {
-    // console.log("loc", location);
+  const requestData = (location, code) => {
     setResults(false);
-    // console.log("on press");
-    fetch(
-      `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=" +
-        ${location}
-        &structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`
-    )
+    let url = code
+      ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${code}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`
+      : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${location}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`;
+    fetch(url)
       .then(results => results.json())
       .then(data => {
-        // console.log("data", data.data[0].newCasesByPublishDate);
-        // console.log("data", data.data);
         let caseInformation = locationCovidInformation.findIndex(
           obj => obj.city == location
         );
-        locations[caseInformation].newCases =
+        locationCovidInformation[caseInformation].newCases =
           data.data[0].newCasesByPublishDate;
-        console.log("info", locations[caseInformation]);
-        setLocationCovidInformation(locations);
+        console.log("info", locationCovidInformation[caseInformation]);
+        setLocationCovidInformation(locationCovidInformation);
         setResults(true);
       });
   };
 
   const MarkerLocations = () => {
     getLocationData();
-    let test = false;
-    // console.log("locationCovidInformation", locationCovidInformation);
     if (locationCovidInformation)
       return locationCovidInformation.map(data => (
-        // console.log("data", [
-        //   data.city,
-        //   parseFloat(data.lat),
-        //   parseFloat(data.lng)
-        // ]),
         <Marker
-          // onPress={() => requestData(data.city)}
+          key={data.id}
+          onPress={() =>
+            requestData(data.city, data.areaCode ? data.areaCode : null)
+          }
           coordinate={{
             latitude: parseFloat(data.lat),
             longitude: parseFloat(data.lng)
           }}
         >
-          {/* <Callout style={{ flex: 1, position: "relative" }}>
-              <View>
-                {beachResults ? (
-                  <View>
-                    <Text>{data.city}</Text>
-                    <Text>New Cases: {data.newCases}</Text>
-                  </View>
-                ) : (
-                  <View>
-                    <Text>Loading Latest Data</Text>
-                  </View>
-                )}
-              </View>
-            </Callout> */}
+          <Callout style={{ flex: 1, position: "relative" }}>
+            <View>
+              {locationResults ? (
+                <View>
+                  <Text>{data.city}</Text>
+                  <Text>New Cases: {data.newCases}</Text>
+                </View>
+              ) : (
+                <View>
+                  <Text>Loading Latest Data</Text>
+                </View>
+              )}
+            </View>
+          </Callout>
         </Marker>
       ));
     else return null;
@@ -408,7 +391,7 @@ const MapsView = ({ route }) => {
       </MapView>
 
       {/* <AnimatedCard /> */}
-      {/* <WelcomeViewCard /> */}
+      <WelcomeViewCard />
       {/* <Pagination navIndex={navIndex}></Pagination> */}
     </SafeAreaView>
   );
