@@ -13,14 +13,22 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "config": {
+        "firebase": {
+          "apiKey": "AIzaSyABC3sm3wgjc2uG9kVpGoM9MQq-Q57TQt4",
+          "authDomain": "nifty-inkwell-302821.firebaseapp.com",
+          "databaseURL": "https://coronavirusrn-65e9c-default-rtdb.europe-west1.firebasedatabase.app",
+          "projectId": "nifty-inkwell-302821",
+          "storageBucket": "nifty-inkwell-302821.appspot.com",
+          "messagingSenderId": "335759551271"
+        }
+      }
     }
   }
 }
