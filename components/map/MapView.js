@@ -1,4 +1,23 @@
 import React, { useRef, useState, useEffect } from "react";
+
+import * as firebase from "firebase";
+import "firebase/firestore";
+
+var firebaseConfig = {
+  apiKey: "AIzaSyAnI9_haRP2wGS_0GjtLk27zkhMz0HhqnA",
+  authDomain: "coronavirusrn-65e9c.firebaseapp.com",
+  databaseURL:
+    "https://coronavirusrn-65e9c-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "coronavirusrn-65e9c",
+  storageBucket: "coronavirusrn-65e9c.appspot.com",
+  messagingSenderId: "29036383264",
+  appId: "1:29036383264:web:db2caefb78fde7a9898045",
+  measurementId: "G-GGEEDZZPSN"
+};
+
+// if (!firebase)
+firebase.initializeApp(firebaseConfig);
+
 import {
   View,
   TouchableNativeFeedback,
@@ -8,12 +27,7 @@ import {
 } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import MapView, { Polygon, Marker, Callout } from "react-native-maps";
-import {
-  getBeachData,
-  getDefaultRegion,
-  getHelpText,
-  Tester
-} from "../../api/api";
+import { getBeachData, getDefaultRegion, getCongestion } from "../../api/api";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 import { styles } from "./styles";
@@ -28,10 +42,15 @@ const MapsView = ({ route }) => {
   const [beachIsDisplayed, setBeachOverlay] = useState(false);
   const [beachResults, setResults] = useState(false);
 
-  const locations = getHelpText();
+  // const locations = getCongestion();
   const [locationCovidInformation, setLocationCovidInformation] = useState(
-    locations
+    null
   );
+  // console.log("tester", locations);
+  // locations.forEach(documentSnapshot => {
+  //   console.log("Location: ", documentSnapshot.data());
+  //   // output.push(documentSnapshot.data());
+  // });
 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -43,8 +62,6 @@ const MapsView = ({ route }) => {
   const polyRef = useRef(null);
 
   const beachData = getBeachData();
-
-  
 
   const switchToBeach = key => {
     setRegion(beachData[key - 1]);
@@ -238,31 +255,40 @@ const MapsView = ({ route }) => {
   };
 
   const MarkerLocations = () => {
-    // const locations = getHelpText();
-    return locationCovidInformation.map(data => (
-      <Marker
-        onPress={() => Tester(data.city)}
-        coordinate={{
-          latitude: parseFloat(data.lat),
-          longitude: parseFloat(data.lng)
-        }}
-      >
-        <Callout style={{ flex: 1, position: "relative" }}>
-          <View>
-            {beachResults ? (
-              <View>
-                <Text>{data.city}</Text>
-                <Text>New Cases: {data.newCases}</Text>
-              </View>
-            ) : (
-              <View>
-                <Text>Loading Latest Data</Text>
-              </View>
-            )}
-          </View>
-        </Callout>
-      </Marker>
-    ));
+    getLocationData();
+    let test = false;
+    // console.log("locationCovidInformation", locationCovidInformation);
+    if (locationCovidInformation)
+      return locationCovidInformation.map(data => (
+        // console.log("data", [
+        //   data.city,
+        //   parseFloat(data.lat),
+        //   parseFloat(data.lng)
+        // ])
+        <Marker
+          onPress={() => Tester(data.city)}
+          coordinate={{
+            latitude: 53.3833,
+            longitude: -1.4667
+          }}
+        >
+          <Callout style={{ flex: 1, position: "relative" }}>
+            <View>
+              {beachResults ? (
+                <View>
+                  <Text>{data.city}</Text>
+                  <Text>New Cases: {data.newCases}</Text>
+                </View>
+              ) : (
+                <View>
+                  <Text>Loading Latest Data</Text>
+                </View>
+              )}
+            </View>
+          </Callout>
+        </Marker>
+      ));
+    else return null;
   };
 
   const closeWindow = () => {
@@ -310,7 +336,27 @@ const MapsView = ({ route }) => {
     }
   };
 
+  const getLocationData = () => {
+    if (!locationCovidInformation) {
+      (async () => {
+        console.log("testerx", locationCovidInformation);
+        let output = [];
+        const dbh = firebase
+          .firestore()
+          .collection("locations")
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(documentSnapshot => {
+              output.push(documentSnapshot.data());
+            });
+            setLocationCovidInformation(output);
+          });
+      })();
+    }
+  };
+
   useFocusEffect(() => {
+    getLocationData();
     getLocation();
 
     if (route.params) {
@@ -346,7 +392,7 @@ const MapsView = ({ route }) => {
         }}
         ref={mapRef}
       >
-        <PolygonViews></PolygonViews>
+        {/* <PolygonViews></PolygonViews> */}
         <Marker
           coordinate={{
             latitude: region.latitude,

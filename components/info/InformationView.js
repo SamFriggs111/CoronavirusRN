@@ -1,23 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, SafeAreaView, ScrollView } from "react-native";
 
-import * as firebase from "firebase";
-import "firebase/firestore";
-
-var firebaseConfig = {
-  apiKey: "AIzaSyAnI9_haRP2wGS_0GjtLk27zkhMz0HhqnA",
-  authDomain: "coronavirusrn-65e9c.firebaseapp.com",
-  databaseURL:
-    "https://coronavirusrn-65e9c-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "coronavirusrn-65e9c",
-  storageBucket: "coronavirusrn-65e9c.appspot.com",
-  messagingSenderId: "29036383264",
-  appId: "1:29036383264:web:db2caefb78fde7a9898045",
-  measurementId: "G-GGEEDZZPSN"
-};
-
-firebase.initializeApp(firebaseConfig);
-
 import { getNoticeText, Tester } from "../../api/api.js";
 import styles from "./styles";
 
@@ -25,20 +8,15 @@ const NoticeTextView = () => {
   const notice = getNoticeText();
   const [commitHistory, setCommitHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  // const locCollection = firestore().collection("location");
-  // const locCollection = firestore()
-  //   .collection("locations")
-  //   .doc("72VLENSzvHCsCMUzLXjy");
   const dbh = firebase
     .firestore()
     .collection("locations")
     .get()
     .then(querySnapshot => {
-      console.log("Total users: ", querySnapshot.size);
-
       querySnapshot.forEach(documentSnapshot => {
-        console.log("User ID: ", documentSnapshot.data());
+        console.log("Location: ", documentSnapshot.data());
       });
+      // console.log("querySnapshot", querySnapshot.data());
     });
 
   // console.log("locCollection", dbh);
