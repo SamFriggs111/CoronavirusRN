@@ -58,35 +58,8 @@ export const getNoticeText = () => {
 
 async function getLocationData() {
   return "TESREE";
-  let output = [];
-  const dbh = await firebase
-    .firestore()
-    .collection("locations")
-    .get()
-    .then(querySnapshot => {
-      querySnapshot.forEach(documentSnapshot => {
-        // console.log("Location: ", documentSnapshot.data());
-        output.push(documentSnapshot.data());
-      });
-      //   console.log(output);
-      return output;
-    });
 }
 
 export const getCongestion = () => {
   return "TESREE";
-  let output = [];
-  const dbh = firebase
-    .firestore()
-    .collection("locations")
-    .get()
-    .then(querySnapshot => {
-      querySnapshot.forEach(documentSnapshot => {
-        // console.log("Location: ", documentSnapshot.data());
-        output.push(documentSnapshot.data());
-      });
-      //   console.log("output", output[0]);
-      return "123";
-    });
-  //   getLocationData();
 };

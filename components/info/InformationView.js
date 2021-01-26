@@ -89,9 +89,7 @@ const InformationView = () => {
         <Text style={styles.textFaq}>FAQ's</Text>
         {/* <GetData /> */}
         <SafeAreaView>
-          <ScrollView>
-            <FaqView />
-          </ScrollView>
+          <ScrollView>{/* <FaqView /> */}</ScrollView>
         </SafeAreaView>
       </View>
     </View>

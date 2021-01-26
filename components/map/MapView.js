@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
-
 import * as firebase from "firebase";
 import "firebase/firestore";
+require("./../../fix-timer-bug");
 
 var firebaseConfig = {
   apiKey: "AIzaSyAnI9_haRP2wGS_0GjtLk27zkhMz0HhqnA",
@@ -22,7 +22,6 @@ import {
   View,
   TouchableNativeFeedback,
   SafeAreaView,
-  ActivityIndicator,
   Text
 } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
@@ -230,7 +229,7 @@ const MapsView = ({ route }) => {
     );
   };
 
-  const Tester = location => {
+  const requestData = location => {
     // console.log("loc", location);
     setResults(false);
     // console.log("on press");
@@ -264,28 +263,28 @@ const MapsView = ({ route }) => {
         //   data.city,
         //   parseFloat(data.lat),
         //   parseFloat(data.lng)
-        // ])
+        // ]),
         <Marker
-          onPress={() => Tester(data.city)}
+          // onPress={() => requestData(data.city)}
           coordinate={{
-            latitude: 53.3833,
-            longitude: -1.4667
+            latitude: parseFloat(data.lat),
+            longitude: parseFloat(data.lng)
           }}
         >
-          <Callout style={{ flex: 1, position: "relative" }}>
-            <View>
-              {beachResults ? (
-                <View>
-                  <Text>{data.city}</Text>
-                  <Text>New Cases: {data.newCases}</Text>
-                </View>
-              ) : (
-                <View>
-                  <Text>Loading Latest Data</Text>
-                </View>
-              )}
-            </View>
-          </Callout>
+          {/* <Callout style={{ flex: 1, position: "relative" }}>
+              <View>
+                {beachResults ? (
+                  <View>
+                    <Text>{data.city}</Text>
+                    <Text>New Cases: {data.newCases}</Text>
+                  </View>
+                ) : (
+                  <View>
+                    <Text>Loading Latest Data</Text>
+                  </View>
+                )}
+              </View>
+            </Callout> */}
         </Marker>
       ));
     else return null;
@@ -356,7 +355,7 @@ const MapsView = ({ route }) => {
   };
 
   useFocusEffect(() => {
-    getLocationData();
+    // getLocationData();
     getLocation();
 
     if (route.params) {
@@ -410,7 +409,7 @@ const MapsView = ({ route }) => {
 
       {/* <AnimatedCard /> */}
       {/* <WelcomeViewCard /> */}
-      <Pagination navIndex={navIndex}></Pagination>
+      {/* <Pagination navIndex={navIndex}></Pagination> */}
     </SafeAreaView>
   );
 };
