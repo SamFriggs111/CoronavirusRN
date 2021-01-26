@@ -27,43 +27,6 @@ const NoticeTextView = () => {
   );
 };
 
-// const GetData = () => {
-//   const locations = getHelpText();
-//   let output = [];
-//   for (var index in locations) {
-//     // console.log("data", locations[index].city);
-//     fetch(
-//       `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${locations[index].city}&structure={"date":"2020-01-25","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`
-//       // `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=Leeds&structure={"date":"2020-01-25","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`
-//     )
-//       .then(results => results.json())
-//       .then(data => {
-//         // console.log("data", data.data[0].areaName);
-//         for (var i = 0; i < locations.length; i++) {
-//           if (locations[i].city == data.data[0].areaName) {
-//             // console.log(locations[i]);
-//             output.push({
-//               city: locations[i].city,
-//               lat: locations[i].lat,
-//               lng: locations[i].lng
-//             });
-//             console.log("out", JSON.stringify(output));
-
-//             break;
-//           }
-//         }
-//       });
-//   }
-//   // console.log("out", JSON.stringify());
-
-//   return <View style={{ flex: 1, padding: 0 }}></View>;
-//   // return cases.map((data, i) => (
-//   //   <View key={i}>
-//   //     <Text style={styles.textPadding}>{data.city}</Text>
-//   //   </View>
-//   // ));
-// };
-
 const FaqView = () => {
   // const faqs = getApiData();
   const test = Tester();

@@ -1,7 +1,5 @@
 import React from "react";
 import { View, Text, Image } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import { getCongestion, getWelcomeData } from "../../../api/api";
 import { styles, welcomeMessage } from "../styles";
 
 const WelcomeDetailView = () => {

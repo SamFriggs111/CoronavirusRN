@@ -101,7 +101,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: 10,
     marginHorizontal: 25
-    // backgroundColor: "red"
   },
   sliderArrow: {
     margin: 15
@@ -118,7 +117,6 @@ export const welcomeMessage = StyleSheet.create({
   },
   slideDesc: {
     padding: 20,
-    // width: 200,
     textAlign: "center",
     fontSize: 13
   },

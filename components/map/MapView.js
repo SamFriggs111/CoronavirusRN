@@ -21,14 +21,15 @@ import {
   View,
   TouchableNativeFeedback,
   SafeAreaView,
-  Text
+  Text,
+  Image
 } from "react-native";
-import { Ionicons, AntDesign } from "@expo/vector-icons";
+import { Ionicons, AntDesign, MaterialIcons } from "@expo/vector-icons";
 import MapView, { Polygon, Marker, Callout } from "react-native-maps";
 import { getBeachData, getDefaultRegion, getCongestion } from "../../api/api";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
-import { styles } from "./styles";
+import { styles, welcomeMessage } from "./styles";
 import BeachDetailView from "./overlay/BeachDetailView";
 import WelcomeDetailView from "./overlay/WelcomeDetailView";
 import * as Location from "expo-location";
@@ -120,28 +121,6 @@ const MapsView = ({ route }) => {
             direction="alternate"
             style={[styles.slide, styles.carousel]}
           >
-            {navIndex !== 0 ? (
-              <TouchableNativeFeedback
-                underlayColor="white"
-                onPress={() => changeBeachDirection("left")}
-              >
-                <Ionicons
-                  style={styles.sliderArrow}
-                  name="ios-arrow-back"
-                  size={54}
-                  color="white"
-                />
-              </TouchableNativeFeedback>
-            ) : (
-              <TouchableNativeFeedback underlayColor="white">
-                <Ionicons
-                  style={styles.sliderArrow}
-                  name="ios-arrow-back"
-                  size={54}
-                  color="red"
-                />
-              </TouchableNativeFeedback>
-            )}
             <View style={styles.innerSlide}>
               <TouchableNativeFeedback
                 underlayColor="white"
@@ -156,28 +135,6 @@ const MapsView = ({ route }) => {
               </TouchableNativeFeedback>
               <BeachDetailView region={region} />
             </View>
-            {navIndex !== beachData.length - 1 ? (
-              <TouchableNativeFeedback
-                underlayColor="white"
-                onPress={() => changeBeachDirection("right")}
-              >
-                <Ionicons
-                  style={styles.sliderArrow}
-                  name="ios-arrow-forward"
-                  size={54}
-                  color="white"
-                />
-              </TouchableNativeFeedback>
-            ) : (
-              <TouchableNativeFeedback underlayColor="white">
-                <Ionicons
-                  style={styles.sliderArrow}
-                  name="ios-arrow-forward"
-                  size={54}
-                  color="red"
-                />
-              </TouchableNativeFeedback>
-            )}
           </Animatable.View>
         ) : null}
       </View>
@@ -190,31 +147,36 @@ const MapsView = ({ route }) => {
         {welcomeMesIsDisplayed ? (
           <Animatable.View
             ref={welcomeRef}
+            // animation="flipInY"
+            // iterationCount={1}
+            // direction="alternate"
             style={[styles.slide, styles.carousel]}
           >
-            {/* <TouchableNativeFeedback
-              underlayColor="white"
-              onPress={() => changeBeachDirection(null, 9)}
-            >
-              <Ionicons
-                style={styles.sliderArrow}
-                name="ios-arrow-back"
-                size={54}
-                color="white"
-              />
-            </TouchableNativeFeedback> */}
-            <WelcomeDetailView />
-            {/* <TouchableNativeFeedback
-              underlayColor="white"
-              onPress={() => changeBeachDirection(null, 10)}
-            >
-              <Ionicons
-                style={styles.sliderArrow}
-                name="ios-arrow-forward"
-                size={54}
-                color="white"
-              />
-            </TouchableNativeFeedback> */}
+            {/* <WelcomeDetailView /> */}
+            <View style={styles.innerSlide}>
+              <View style={styles.sliders}>
+                <Text style={welcomeMessage.slideDesc}>Getting Location</Text>
+                {!location ? (
+                  <Image
+                    source={require("./../../assets/loading.gif")}
+                    style={{ width: 20, height: 20 }}
+                  />
+                ) : (
+                  <MaterialIcons name="done" size={20} color="green" />
+                )}
+              </View>
+              <View style={styles.sliders}>
+                <Text style={welcomeMessage.slideDesc}>Retrieving data</Text>
+                {!locationCovidInformation ? (
+                  <Image
+                    source={require("./../../assets/loading.gif")}
+                    style={{ width: 20, height: 20 }}
+                  />
+                ) : (
+                  <MaterialIcons name="done" size={20} color="green" />
+                )}
+              </View>
+            </View>
           </Animatable.View>
         ) : null}
       </View>
@@ -244,6 +206,7 @@ const MapsView = ({ route }) => {
         //   longitudeDelta: 0.017
         // });
         setResults(true);
+        setBeachOverlay(true);
       });
   };
 
@@ -315,10 +278,11 @@ const MapsView = ({ route }) => {
           setErrorMsg("Permission to access location was denied");
           return;
         }
-
         let location = await Location.getCurrentPositionAsync({});
         setLocation(location);
         setRegion(location.coords);
+        welcomeRef.current.flipOutY();
+        // setWelcomeMessageOverlay(false);
       })();
     }
   };
@@ -342,6 +306,11 @@ const MapsView = ({ route }) => {
   };
 
   useFocusEffect(() => {
+    if (locationResults) {
+      console.log("tesfaesfw");
+      // welcomeRef.current.flipOutY();
+      setWelcomeMessageOverlay(false);
+    }
     console.log("useFocusEffect");
     getMyLocation();
 
@@ -394,7 +363,7 @@ const MapsView = ({ route }) => {
         <MarkerLocations />
       </MapView>
 
-      {/* <AnimatedCard /> */}
+      <AnimatedCard />
       <WelcomeViewCard />
       {/* <Pagination navIndex={navIndex}></Pagination> */}
     </SafeAreaView>
