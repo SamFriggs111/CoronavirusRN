@@ -214,9 +214,9 @@ const MapsView = ({ route }) => {
     getLocationData();
     if (locationCovidInformation)
       return locationCovidInformation.map(data => (
-        <View>
+        <View key={data.id}>
           <Marker
-            key={data.id}
+            // key={data.id}
             onPress={() => requestData(data)}
             coordinate={{
               latitude: parseFloat(data.lat),
@@ -281,14 +281,13 @@ const MapsView = ({ route }) => {
   const getLocationData = () => {
     if (!locationCovidInformation) {
       (async () => {
-        let output = [];
+        // let output = [];
         firebase
           .firestore()
           .collection("locations")
           .get()
           .then(querySnapshot => {
             querySnapshot.forEach(documentSnapshot => {
-              // console.log("documentSnapshot", documentSnapshot.data().city);
               let url = documentSnapshot.data().areaCode
                 ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${
                     documentSnapshot.data().areaCode
@@ -300,22 +299,25 @@ const MapsView = ({ route }) => {
               fetch(url)
                 .then(results => results.json())
                 .then(data => {
-                  let newLocationData = documentSnapshot.data();
-                  newLocationData.newCases = data.data[0].newCasesByPublishDate;
-                  // console.log("newLocationData", newLocationData);
-                  output.push(newLocationData);
+                  let locationData = documentSnapshot.data();
+                  locationData.newCasesByPublishDate =
+                    data.data[0].newCasesByPublishDate;
+                  // setLocationCovidInformation
+                  // output.push(locationData);
+                  console.log("output", locationData);
+                  setLocationCovidInformation();
                 });
             });
+            // console.log("output1", locationCovidInformation);
           });
-        console.log("output", output);
-        setLocationCovidInformation(output);
+        // setLocationCovidInformation(output);
       })();
     }
   };
 
   useFocusEffect(() => {
     if (locationResults) {
-      console.log("tesfaesfw");
+      // console.log("tesfaesfw");
       // welcomeRef.current.flipOutY();
       setWelcomeMessageOverlay(false);
     }
