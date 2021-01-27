@@ -25,7 +25,7 @@ import {
   Image
 } from "react-native";
 import { Ionicons, AntDesign, MaterialIcons } from "@expo/vector-icons";
-import MapView, { Polygon, Marker, Callout } from "react-native-maps";
+import MapView, { Polygon, Marker, Callout, Circle } from "react-native-maps";
 import { getBeachData, getDefaultRegion, getCongestion } from "../../api/api";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
@@ -39,7 +39,7 @@ const MapsView = ({ route }) => {
   const [navIndex, setNavIndex] = useState(null);
   const [welcomeMesIsDisplayed, setWelcomeMessageOverlay] = useState(true);
   const [beachIsDisplayed, setBeachOverlay] = useState(false);
-  const [locationResults, setResults] = useState(false);
+  const [locationResults, setLocationResults] = useState(false);
   const [locationCovidInformation, setLocationCovidInformation] = useState(
     null
   );
@@ -122,7 +122,7 @@ const MapsView = ({ route }) => {
             style={[styles.slide, styles.carousel]}
           >
             <View style={styles.innerSlide}>
-              <TouchableNativeFeedback
+              {/* <TouchableNativeFeedback
                 underlayColor="white"
                 onPress={closeWindow}
               >
@@ -132,8 +132,8 @@ const MapsView = ({ route }) => {
                   size={30}
                   color="red"
                 />
-              </TouchableNativeFeedback>
-              <BeachDetailView region={region} />
+              </TouchableNativeFeedback> */}
+              <BeachDetailView location={locationResults} />
             </View>
           </Animatable.View>
         ) : null}
@@ -184,10 +184,10 @@ const MapsView = ({ route }) => {
   };
 
   const requestData = location => {
-    setResults(false);
+    setLocationResults(false);
     let url = location.areaCode
-      ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${location.areaCode}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`
-      : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${location.city}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeathsByDeathDate":"newDeathsByDeathDate","cumDeathsByDeathDate":"cumDeathsByDeathDate"}`;
+      ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${location.areaCode}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`
+      : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${location.city}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`;
 
     fetch(url)
       .then(results => results.json())
@@ -205,7 +205,7 @@ const MapsView = ({ route }) => {
         //   latitudeDelta: 0.017,
         //   longitudeDelta: 0.017
         // });
-        setResults(true);
+        setLocationResults(data.data[0]);
         setBeachOverlay(true);
       });
   };
@@ -214,29 +214,41 @@ const MapsView = ({ route }) => {
     getLocationData();
     if (locationCovidInformation)
       return locationCovidInformation.map(data => (
-        <Marker
-          key={data.id}
-          onPress={() => requestData(data)}
-          coordinate={{
-            latitude: parseFloat(data.lat),
-            longitude: parseFloat(data.lng)
-          }}
-        >
-          <Callout style={{ flex: 1, position: "relative" }}>
-            <View>
-              {locationResults ? (
-                <View>
-                  <Text>{data.city}</Text>
-                  <Text>New Cases: {data.newCases}</Text>
-                </View>
-              ) : (
-                <View>
-                  <Text>Loading Latest Data</Text>
-                </View>
-              )}
-            </View>
-          </Callout>
-        </Marker>
+        <View>
+          <Marker
+            key={data.id}
+            onPress={() => requestData(data)}
+            coordinate={{
+              latitude: parseFloat(data.lat),
+              longitude: parseFloat(data.lng)
+            }}
+          >
+            <Callout style={{ flex: 1, position: "relative" }}>
+              <View>
+                {locationResults ? (
+                  <View>
+                    <Text>{data.city}</Text>
+                    <Text>New Cases: {data.newCases}</Text>
+                  </View>
+                ) : (
+                  <View>
+                    <Text>Loading Latest Data</Text>
+                  </View>
+                )}
+              </View>
+            </Callout>
+          </Marker>
+          <Circle
+            // key={data.id}
+            onPress={() => requestData(data)}
+            center={{
+              latitude: parseFloat(data.lat),
+              longitude: parseFloat(data.lng)
+            }}
+            radius={5000}
+            fillColor="rgba(168, 50, 50, 0.5)"
+          />
+        </View>
       ));
     else return null;
   };
@@ -246,27 +258,6 @@ const MapsView = ({ route }) => {
     if (beachIsDisplayed) {
       beachRef.current.flipOutY();
       paginationRef.current.flipOutY();
-    }
-  };
-
-  const changeBeachDirection = (direction, jumpTo) => {
-    if (!jumpTo) {
-      let navIndex = region.id - 1;
-      if (direction == "left") {
-        updatePolygonStrokeColour(navIndex - 1);
-        setRegion(beachData[navIndex - 1]);
-        setNavIndex(beachData[navIndex - 1].id - 1);
-      } else if (direction == "right") {
-        updatePolygonStrokeColour(navIndex + 1);
-        setRegion(beachData[navIndex + 1]);
-        setNavIndex(beachData[navIndex + 1].id - 1);
-      }
-    } else {
-      updatePolygonStrokeColour(jumpTo - 1);
-      setRegion(beachData[jumpTo - 1]);
-      setNavIndex(beachData[jumpTo - 1].id - 1);
-      setWelcomeMessageOverlay(false);
-      setBeachOverlay(true);
     }
   };
 
@@ -353,10 +344,11 @@ const MapsView = ({ route }) => {
             latitude: region.latitude,
             longitude: region.longitude
           }}
+          pinColor="black"
         >
           <Callout style={{ flex: 1, position: "relative" }}>
             <View>
-              <Text>My Location</Text>
+              <Text>Your Location</Text>
             </View>
           </Callout>
         </Marker>
