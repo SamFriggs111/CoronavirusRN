@@ -208,7 +208,7 @@ const MapsView = ({ route }) => {
         }
         let location = await Location.getCurrentPositionAsync({});
         setLocation(location.coords);
-        // setRegion(location.coords);
+        setRegion(location.coords);
         welcomeRef.current.flipOutY();
       })();
     }
@@ -292,7 +292,7 @@ const MapsView = ({ route }) => {
                 latitude: location.latitude,
                 longitude: location.longitude
               }}
-              pinColor="black"
+              pinColor={"blue"}
             >
               <Callout style={{ flex: 1, position: "relative" }}>
                 <View>
