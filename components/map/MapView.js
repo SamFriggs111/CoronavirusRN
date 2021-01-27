@@ -36,7 +36,6 @@ import * as Location from "expo-location";
 
 const MapsView = ({ route }) => {
   const [region, setRegion] = useState(getDefaultRegion());
-  const [navIndex, setNavIndex] = useState(null);
   const [welcomeMesIsDisplayed, setWelcomeMessageOverlay] = useState(true);
   const [beachIsDisplayed, setBeachOverlay] = useState(false);
   const [locationResults, setLocationResults] = useState(false);
@@ -51,40 +50,6 @@ const MapsView = ({ route }) => {
   const beachRef = useRef(null);
   const welcomeRef = useRef(null);
   const paginationRef = useRef(null);
-  const polyRef = useRef(null);
-
-  const beachData = getBeachData();
-
-  const switchToBeach = key => {
-    setRegion(beachData[key - 1]);
-    setNavIndex(beachData[key - 1].id - 1);
-    setWelcomeMessageOverlay(false);
-    updatePolygonStrokeColour(key - 1);
-  };
-
-  const updatePolygonStrokeColour = key => {
-    beachData.forEach(index =>
-      setBeachOverlay((beachData[index.id - 1].strokeColour = null))
-    );
-    if (key || key == 0) {
-      let strokeColour = "black";
-      setBeachOverlay((beachData[key].strokeColour = strokeColour));
-    }
-  };
-
-  const PolygonViews = () => {
-    return beachData.map(data => (
-      <Polygon
-        ref={polyRef}
-        key={data.id}
-        onPress={() => switchToBeach(data.id)}
-        tappable={true}
-        fillColor={data.polygonColour}
-        strokeColor={data.strokeColour ? data.strokeColour : data.polygonColour}
-        coordinates={data.polygonCoordinates}
-      />
-    ));
-  };
 
   const AnimatedCard = () => {
     return (
@@ -123,9 +88,6 @@ const MapsView = ({ route }) => {
         {welcomeMesIsDisplayed ? (
           <Animatable.View
             ref={welcomeRef}
-            // animation="flipInY"
-            // iterationCount={1}
-            // direction="alternate"
             style={[styles.slide, styles.carousel]}
           >
             <View style={styles.innerSlide}>
@@ -159,7 +121,14 @@ const MapsView = ({ route }) => {
   };
 
   const requestData = location => {
+    setWelcomeMessageOverlay(false);
     setLocationResults(false);
+    setRegion({
+      latitude: location.lat,
+      longitude: location.lng,
+      latitudeDelta: 0.1,
+      longitudeDelta: 0.1
+    });
     let url = location.areaCode
       ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${location.areaCode}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`
       : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${location.city}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`;
@@ -197,7 +166,6 @@ const MapsView = ({ route }) => {
                 {locationResults ? (
                   <View>
                     <Text>{data.city}</Text>
-                    <Text>New Cases: {data.newCases}</Text>
                   </View>
                 ) : (
                   <View>
@@ -231,6 +199,7 @@ const MapsView = ({ route }) => {
 
   const getMyLocation = () => {
     if (!location) {
+      console.log("location false");
       (async () => {
         let { status } = await Location.requestPermissionsAsync();
         if (status !== "granted") {
@@ -238,8 +207,8 @@ const MapsView = ({ route }) => {
           return;
         }
         let location = await Location.getCurrentPositionAsync({});
-        setLocation(location);
-        setRegion(location.coords);
+        setLocation(location.coords);
+        // setRegion(location.coords);
         welcomeRef.current.flipOutY();
       })();
     }
@@ -296,12 +265,11 @@ const MapsView = ({ route }) => {
         {
           latitude: region.latitude,
           longitude: region.longitude,
-          latitudeDelta: 0.017,
-          longitudeDelta: 0.017
+          latitudeDelta: 0.15,
+          longitudeDelta: 0.15
         },
         2000
       );
-      // setNavIndex(region.id - 1);
     }
   });
 
@@ -312,25 +280,28 @@ const MapsView = ({ route }) => {
         initialRegion={{
           latitude: region.latitude,
           longitude: region.longitude,
-          latitudeDelta: 0.017,
-          longitudeDelta: 0.017
+          latitudeDelta: 0.3,
+          longitudeDelta: 0.3
         }}
         ref={mapRef}
       >
-        {/* <PolygonViews></PolygonViews> */}
-        <Marker
-          coordinate={{
-            latitude: region.latitude,
-            longitude: region.longitude
-          }}
-          pinColor="black"
-        >
-          <Callout style={{ flex: 1, position: "relative" }}>
-            <View>
-              <Text>Your Location</Text>
-            </View>
-          </Callout>
-        </Marker>
+        {location ? (
+          <View>
+            <Marker
+              coordinate={{
+                latitude: location.latitude,
+                longitude: location.longitude
+              }}
+              pinColor="black"
+            >
+              <Callout style={{ flex: 1, position: "relative" }}>
+                <View>
+                  <Text>Your Location</Text>
+                </View>
+              </Callout>
+            </Marker>
+          </View>
+        ) : null}
         <MarkerLocations />
       </MapView>
 
