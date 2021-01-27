@@ -1,20 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
-import * as firebase from "firebase";
-import "firebase/firestore";
 require("./../../fix-timer-bug");
 
-var firebaseConfig = {
-  apiKey: "AIzaSyAnI9_haRP2wGS_0GjtLk27zkhMz0HhqnA",
-  authDomain: "coronavirusrn-65e9c.firebaseapp.com",
-  databaseURL:
-    "https://coronavirusrn-65e9c-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "coronavirusrn-65e9c",
-  storageBucket: "coronavirusrn-65e9c.appspot.com",
-  messagingSenderId: "29036383264",
-  appId: "1:29036383264:web:db2caefb78fde7a9898045",
-  measurementId: "G-GGEEDZZPSN"
-};
-
+import * as firebase from "firebase";
+import "firebase/firestore";
+const firebaseConfig = require("./../../config");
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
 import {
@@ -26,7 +15,11 @@ import {
 } from "react-native";
 import { Ionicons, AntDesign, MaterialIcons } from "@expo/vector-icons";
 import MapView, { Polygon, Marker, Callout, Circle } from "react-native-maps";
-import { getBeachData, getDefaultRegion, getCongestion } from "../../api/api";
+import {
+  getLocationsData,
+  getDefaultRegion,
+  getCongestion
+} from "../../api/api";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 import { styles, welcomeMessage } from "./styles";

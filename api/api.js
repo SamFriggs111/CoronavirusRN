@@ -1,3 +1,8 @@
+import * as firebase from "firebase";
+import "firebase/firestore";
+const firebaseConfig = require("./../config");
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
 export const getDefaultRegion = () => {
   return {
     latitude: 50.72,
@@ -7,12 +12,19 @@ export const getDefaultRegion = () => {
   };
 };
 
-export const getBeachData = () => {
-  return null;
-};
-
-export const getWelcomeData = () => {
-  return welcomeCard;
+export const getLocationsData = async () => {
+  let output = [];
+  await firebase
+    .firestore()
+    .collection("locations")
+    .get()
+    .then(querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        output.push(documentSnapshot.data());
+      });
+    });
+  console.log(output);
+  return output;
 };
 
 export const Tester = () => {
