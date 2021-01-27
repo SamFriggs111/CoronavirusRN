@@ -21,11 +21,11 @@ const BeachFeature = props => {
 };
 
 const BeachDetailView = props => {
-  console.log(props.location);
+  // console.log(props.location);
   return (
     <View>
       <View style={styles.titleView}>
-        <Text style={styles.slideTitle}>{props.location.areaName}</Text>
+        <Text style={styles.slideTitle}>{props.location.city}</Text>
       </View>
       <View style={styles.sliders}></View>
       {/* <View style={styles.warning}>

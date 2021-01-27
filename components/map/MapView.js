@@ -37,7 +37,7 @@ import * as Location from "expo-location";
 const MapsView = ({ route }) => {
   const [region, setRegion] = useState(getDefaultRegion());
   const [welcomeMesIsDisplayed, setWelcomeMessageOverlay] = useState(true);
-  const [beachIsDisplayed, setBeachOverlay] = useState(false);
+  const [locationIsDisplayed, setLocationOverlay] = useState(false);
   const [locationResults, setLocationResults] = useState(false);
   const [locationCovidInformation, setLocationCovidInformation] = useState(
     null
@@ -54,7 +54,7 @@ const MapsView = ({ route }) => {
   const AnimatedCard = () => {
     return (
       <View>
-        {beachIsDisplayed ? (
+        {locationIsDisplayed ? (
           <Animatable.View
             ref={beachRef}
             animation="flipInY"
@@ -139,12 +139,15 @@ const MapsView = ({ route }) => {
         let caseInformation = locationCovidInformation.findIndex(
           obj => obj.city == location.city
         );
+        let areaData = data.data[0];
+        areaData.city = location.city;
 
         locationCovidInformation[caseInformation].newCases =
-          data.data[0].newCasesByPublishDate;
+          areaData.newCasesByPublishDate;
+
         setLocationCovidInformation(locationCovidInformation);
-        setLocationResults(data.data[0]);
-        setBeachOverlay(true);
+        setLocationResults(areaData);
+        setLocationOverlay(true);
       });
   };
 
@@ -191,7 +194,7 @@ const MapsView = ({ route }) => {
 
   const closeWindow = () => {
     updatePolygonStrokeColour(null);
-    if (beachIsDisplayed) {
+    if (locationIsDisplayed) {
       beachRef.current.flipOutY();
       paginationRef.current.flipOutY();
     }
@@ -257,7 +260,7 @@ const MapsView = ({ route }) => {
     //   updatePolygonStrokeColour(route.params.region.id - 1);
     //   setRegion(route.params.region);
     //   setWelcomeMessageOverlay(false);
-    //   setBeachOverlay(true);
+    //   setLocationOverlay(true);
     // }
     if (mapRef.current) {
       route.params = null;
