@@ -59,4 +59,22 @@ const InformationView = () => {
   );
 };
 
+const getLocationData = () => {
+  if (!locationCovidInformation) {
+    (async () => {
+      let output = [];
+      firebase
+        .firestore()
+        .collection("locations")
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(documentSnapshot => {
+            output.push(documentSnapshot.data());
+          });
+          setLocationCovidInformation(output);
+        });
+    })();
+  }
+};
+
 export default InformationView;

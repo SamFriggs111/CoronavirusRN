@@ -212,7 +212,8 @@ const MapsView = ({ route }) => {
 
   const MarkerLocations = () => {
     getLocationData();
-    if (locationCovidInformation)
+    if (locationCovidInformation) {
+      console.log("locationCovidInformation", locationCovidInformation);
       return locationCovidInformation.map(data => (
         <View key={data.id}>
           <Marker
@@ -250,7 +251,7 @@ const MapsView = ({ route }) => {
           />
         </View>
       ));
-    else return null;
+    } else return null;
   };
 
   const closeWindow = () => {
@@ -278,16 +279,18 @@ const MapsView = ({ route }) => {
     }
   };
 
+  // const [beachIsDisplayed, setBeachOverlay] = useState(false);
   const getLocationData = () => {
     if (!locationCovidInformation) {
       (async () => {
-        // let output = [];
+        let output = [];
         firebase
           .firestore()
           .collection("locations")
           .get()
           .then(querySnapshot => {
             querySnapshot.forEach(documentSnapshot => {
+              // output.push(documentSnapshot.data());
               let url = documentSnapshot.data().areaCode
                 ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${
                     documentSnapshot.data().areaCode
@@ -302,15 +305,12 @@ const MapsView = ({ route }) => {
                   let locationData = documentSnapshot.data();
                   locationData.newCasesByPublishDate =
                     data.data[0].newCasesByPublishDate;
-                  // setLocationCovidInformation
-                  // output.push(locationData);
-                  console.log("output", locationData);
-                  setLocationCovidInformation();
+                  output.push(locationData);
+                  setLocationCovidInformation(output);
                 });
             });
-            // console.log("output1", locationCovidInformation);
+            // setLocationCovidInformation(output);
           });
-        // setLocationCovidInformation(output);
       })();
     }
   };
