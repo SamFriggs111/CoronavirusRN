@@ -288,10 +288,27 @@ const MapsView = ({ route }) => {
           .get()
           .then(querySnapshot => {
             querySnapshot.forEach(documentSnapshot => {
-              output.push(documentSnapshot.data());
+              // console.log("documentSnapshot", documentSnapshot.data().city);
+              let url = documentSnapshot.data().areaCode
+                ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${
+                    documentSnapshot.data().areaCode
+                  }&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`
+                : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${
+                    documentSnapshot.data().city
+                  }&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`;
+
+              fetch(url)
+                .then(results => results.json())
+                .then(data => {
+                  let newLocationData = documentSnapshot.data();
+                  newLocationData.newCases = data.data[0].newCasesByPublishDate;
+                  // console.log("newLocationData", newLocationData);
+                  output.push(newLocationData);
+                });
             });
-            setLocationCovidInformation(output);
           });
+        console.log("output", output);
+        setLocationCovidInformation(output);
       })();
     }
   };
