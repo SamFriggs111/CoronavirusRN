@@ -1,12 +1,12 @@
 // Firebase Config
 const firebaseConfig = {
-  apiKey: "AIzaSyABC3sm3wgjc2uG9kVpGoM9MQq-Q57TQt4",
-  authDomain: "nifty-inkwell-302821.firebaseapp.com",
+  apiKey: "AIzaSyAnI9_haRP2wGS_0GjtLk27zkhMz0HhqnA",
+  authDomain: "coronavirusrn-65e9c.firebaseapp.com",
   databaseURL:
     "https://coronavirusrn-65e9c-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "nifty-inkwell-302821",
-  storageBucket: "nifty-inkwell-302821.appspot.com",
-  messagingSenderId: "335759551271"
+  projectId: "coronavirusrn-65e9c",
+  storageBucket: "coronavirusrn-65e9c.appspot.com",
+  messagingSenderId: "29036383264"
 };
 // Exports
 module.exports = firebaseConfig;
