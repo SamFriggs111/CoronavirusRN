@@ -86,30 +86,6 @@ const MapsView = ({ route }) => {
     ));
   };
 
-  const Pagination = ({ navIndex }) => {
-    return (
-      <View>
-        {beachIsDisplayed ? (
-          <Animatable.View ref={paginationRef} style={styles.pagination}>
-            {beachData.map((_, key) => {
-              return (
-                <View
-                  key={key}
-                  style={[
-                    styles.paginationDot,
-                    navIndex === key
-                      ? styles.paginationDotActive
-                      : styles.paginationDotInactive
-                  ]}
-                />
-              );
-            })}
-          </Animatable.View>
-        ) : null}
-      </View>
-    );
-  };
-
   const AnimatedCard = () => {
     return (
       <View>
@@ -152,7 +128,6 @@ const MapsView = ({ route }) => {
             // direction="alternate"
             style={[styles.slide, styles.carousel]}
           >
-            {/* <WelcomeDetailView /> */}
             <View style={styles.innerSlide}>
               <View style={styles.sliders}>
                 <Text style={welcomeMessage.slideDesc}>Getting Location</Text>
@@ -199,12 +174,6 @@ const MapsView = ({ route }) => {
         locationCovidInformation[caseInformation].newCases =
           data.data[0].newCasesByPublishDate;
         setLocationCovidInformation(locationCovidInformation);
-        // setRegion({
-        //   latitude: location.lat,
-        //   longitude: location.lng,
-        //   latitudeDelta: 0.017,
-        //   longitudeDelta: 0.017
-        // });
         setLocationResults(data.data[0]);
         setBeachOverlay(true);
       });
@@ -213,11 +182,10 @@ const MapsView = ({ route }) => {
   const MarkerLocations = () => {
     getLocationData();
     if (locationCovidInformation) {
-      console.log("locationCovidInformation", locationCovidInformation);
+      // console.log("locationCovidInformation", locationCovidInformation);
       return locationCovidInformation.map(data => (
         <View key={data.id}>
           <Marker
-            // key={data.id}
             onPress={() => requestData(data)}
             coordinate={{
               latitude: parseFloat(data.lat),
@@ -240,7 +208,6 @@ const MapsView = ({ route }) => {
             </Callout>
           </Marker>
           <Circle
-            // key={data.id}
             onPress={() => requestData(data)}
             center={{
               latitude: parseFloat(data.lat),
@@ -274,12 +241,10 @@ const MapsView = ({ route }) => {
         setLocation(location);
         setRegion(location.coords);
         welcomeRef.current.flipOutY();
-        // setWelcomeMessageOverlay(false);
       })();
     }
   };
 
-  // const [beachIsDisplayed, setBeachOverlay] = useState(false);
   const getLocationData = () => {
     if (!locationCovidInformation) {
       (async () => {
@@ -290,60 +255,55 @@ const MapsView = ({ route }) => {
           .get()
           .then(querySnapshot => {
             querySnapshot.forEach(documentSnapshot => {
-              // output.push(documentSnapshot.data());
-              let url = documentSnapshot.data().areaCode
-                ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${
-                    documentSnapshot.data().areaCode
-                  }&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`
-                : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${
-                    documentSnapshot.data().city
-                  }&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`;
+              output.push(documentSnapshot.data());
+              // let url = documentSnapshot.data().areaCode
+              //   ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${
+              //       documentSnapshot.data().areaCode
+              //     }&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`
+              //   : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${
+              //       documentSnapshot.data().city
+              //     }&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`;
 
-              fetch(url)
-                .then(results => results.json())
-                .then(data => {
-                  let locationData = documentSnapshot.data();
-                  locationData.newCasesByPublishDate =
-                    data.data[0].newCasesByPublishDate;
-                  output.push(locationData);
-                  setLocationCovidInformation(output);
-                });
+              // fetch(url)
+              //   .then(results => results.json())
+              //   .then(data => {
+              //     let locationData = documentSnapshot.data();
+              //     locationData.newCasesByPublishDate =
+              //       data.data[0].newCasesByPublishDate;
+              //     output.push(locationData);
+              //     setLocationCovidInformation(output);
+              //   });
             });
-            // setLocationCovidInformation(output);
+            setLocationCovidInformation(output);
           });
       })();
     }
   };
 
   useFocusEffect(() => {
-    if (locationResults) {
-      // console.log("tesfaesfw");
-      // welcomeRef.current.flipOutY();
-      setWelcomeMessageOverlay(false);
-    }
     console.log("useFocusEffect");
     getMyLocation();
 
-    if (route.params) {
-      updatePolygonStrokeColour(route.params.region.id - 1);
-      setRegion(route.params.region);
-      setWelcomeMessageOverlay(false);
-      setBeachOverlay(true);
-    }
+    // if (route.params) {
+    //   updatePolygonStrokeColour(route.params.region.id - 1);
+    //   setRegion(route.params.region);
+    //   setWelcomeMessageOverlay(false);
+    //   setBeachOverlay(true);
+    // }
     if (mapRef.current) {
       route.params = null;
-      // mapRef.current.animateToRegion(
-      //   {
-      //     latitude: region.latitude,
-      //     longitude: region.longitude,
-      //     latitudeDelta: 0.017,
-      //     longitudeDelta: 0.017
-      //   },
-      //   2000
-      // );
-      setNavIndex(region.id - 1);
+      mapRef.current.animateToRegion(
+        {
+          latitude: region.latitude,
+          longitude: region.longitude,
+          latitudeDelta: 0.017,
+          longitudeDelta: 0.017
+        },
+        2000
+      );
+      // setNavIndex(region.id - 1);
     }
-  }, []);
+  });
 
   return (
     <SafeAreaView>
