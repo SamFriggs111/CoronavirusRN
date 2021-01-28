@@ -43,7 +43,6 @@ const MapsView = ({ route }) => {
   const mapRef = useRef(null);
   const beachRef = useRef(null);
   const welcomeRef = useRef(null);
-  const paginationRef = useRef(null);
 
   const AnimatedCard = () => {
     return (
@@ -86,7 +85,7 @@ const MapsView = ({ route }) => {
           >
             <View style={styles.innerSlide}>
               <View style={styles.sliders}>
-                <Text style={welcomeMessage.slideDesc}>Getting Location</Text>
+                <Text style={welcomeMessage.slideDesc}>Getting location</Text>
                 {!location ? (
                   <Image
                     source={require("./../../assets/loading.gif")}
@@ -313,10 +312,8 @@ const MapsView = ({ route }) => {
         ) : null}
         <MarkerLocations />
       </MapView>
-
       <AnimatedCard />
       <WelcomeViewCard />
-      {/* <Pagination navIndex={navIndex}></Pagination> */}
     </SafeAreaView>
   );
 };

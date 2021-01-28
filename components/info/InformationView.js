@@ -1,80 +1,56 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, SafeAreaView, ScrollView } from "react-native";
+import { WebView } from "react-native-webview";
 
 import { getNoticeText, Tester } from "../../api/api.js";
 import styles from "./styles";
 
-const NoticeTextView = () => {
-  const notice = getNoticeText();
-  const [commitHistory, setCommitHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const dbh = firebase
-    .firestore()
-    .collection("locations")
-    .get()
-    .then(querySnapshot => {
-      querySnapshot.forEach(documentSnapshot => {
-        console.log("Location: ", documentSnapshot.data());
-      });
-      // console.log("querySnapshot", querySnapshot.data());
-    });
-
-  // console.log("locCollection", dbh);
-  return (
-    <View style={styles.container}>
-      <Text style={styles.paragraph}>text</Text>
-    </View>
-  );
-};
-
-const FaqView = () => {
-  // const faqs = getApiData();
-  const test = Tester();
-  // console.log("test", faqs);
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.paragraph}>text</Text>
-    </View>
-  );
-  // return faqs.map((data, i) => (
-  //   <View key={i}>
-  //     <Text style={styles.textPadding}>{data.city}</Text>
-  //   </View>
-  // ));
-};
-
 const InformationView = () => {
+  const [covidInformation, setCovidInformation] = useState(null);
+  let url =
+    "https://api.nhs.uk/conditions/coronavirus-covid-19?url=whatsapp&modules=true";
+
+  const getInformation = () => {
+    if (!covidInformation)
+      fetch(url)
+        .then(results => results.json())
+        .then(data => {
+          if (data.modules.text !== "") setCovidInformation(data.modules);
+        });
+  };
+
+  const NoticeTextView = () => {
+    getInformation();
+    console.log("1");
+    return (
+      <View style={{ flex: 1 }}>
+        {covidInformation ? (
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.textContainer, styles.title]}>
+              Latest Information
+            </Text>
+            <WebView
+              scalesPageToFit={false}
+              source={{ html: covidInformation[0].text }}
+            />
+            <Text style={[styles.textContainer, styles.title]}>Treatment</Text>
+            <WebView
+              scalesPageToFit={false}
+              source={{ html: covidInformation[4].text }}
+            />
+          </View>
+        ) : null}
+      </View>
+    );
+  };
+
   return (
     <View style={{ flex: 1, padding: 0 }}>
-      <NoticeTextView />
       <View style={[styles.textContainer, styles.helpFlex]}>
-        <Text style={styles.textFaq}>FAQ's</Text>
-        {/* <GetData /> */}
-        <SafeAreaView>
-          <ScrollView>{/* <FaqView /> */}</ScrollView>
-        </SafeAreaView>
+        <NoticeTextView />
       </View>
     </View>
   );
-};
-
-const getLocationData = () => {
-  if (!locationCovidInformation) {
-    (async () => {
-      let output = [];
-      firebase
-        .firestore()
-        .collection("locations")
-        .get()
-        .then(querySnapshot => {
-          querySnapshot.forEach(documentSnapshot => {
-            output.push(documentSnapshot.data());
-          });
-          setLocationCovidInformation(output);
-        });
-    })();
-  }
 };
 
 export default InformationView;

@@ -10,13 +10,7 @@ export default function App() {
     <NavigationContainer>
       <StatusBar hidden={false} backgroundColor="dodgerblue" />
       <View style={styles.menu}>
-        <FontAwesome5
-          style={styles.titleIcon}
-          name="umbrella-beach"
-          size={24}
-          color="white"
-        />
-        <Text style={styles.title}>Beach Congestion</Text>
+        <Text style={styles.title}>Coronavirus Statistics</Text>
       </View>
       <Tabs />
     </NavigationContainer>

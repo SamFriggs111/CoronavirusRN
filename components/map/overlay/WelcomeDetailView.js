@@ -6,7 +6,7 @@ const WelcomeDetailView = () => {
   return (
     <View style={styles.innerSlide}>
       <View style={styles.sliders}>
-        <Text style={welcomeMessage.slideDesc}>Getting Location</Text>
+        <Text style={welcomeMessage.slideDesc}>Getting location</Text>
         <Image
           source={require("./../../../assets/loading.gif")}
           style={{ width: 20, height: 20 }}
