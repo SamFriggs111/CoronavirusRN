@@ -29,17 +29,15 @@ const Item = ({ title, congestionColour }) => (
 
 const SearchView = ({ navigation }) => {
   const [value, onChangeText] = useState("");
-  const [data, setBeachData] = useState(null);
+  const [locations, setLocations] = useState(null);
+  const [filteredLocationData, filterLocationData] = useState(null);
   const refreshing = false;
 
-  // console.log(getLocationData());
-
   const getLocationData = () => {
-    if (!data) {
+    if (!filteredLocationData) {
       (async () => {
-        console.log("test");
         let output = [];
-        firebase
+        await firebase
           .firestore()
           .collection("locations")
           .get()
@@ -47,21 +45,18 @@ const SearchView = ({ navigation }) => {
             querySnapshot.forEach(documentSnapshot => {
               output.push(documentSnapshot.data());
             });
-            // console.log(output);
-            // return output;
-            setBeachData(output);
-            // break;
+            filterLocationData(output);
+            setLocations(output);
           });
       })();
     }
   };
-  // let test = getLocationData();
-  // const [data, setBeachData] = useState(null);
-  // console.log(data);
+
+  getLocationData();
 
   const searchFilterFunction = text => {
     onChangeText(text);
-    let items = data;
+    let items = locations;
     let newData = items;
 
     if (text) {
@@ -73,7 +68,7 @@ const SearchView = ({ navigation }) => {
       });
     }
 
-    setBeachData(newData);
+    filterLocationData(newData);
   };
 
   const renderItem = ({ item }) => (
@@ -93,12 +88,12 @@ const SearchView = ({ navigation }) => {
         style={styles.searchBar}
       />
       <FlatList
-        data={data}
+        data={filteredLocationData}
         renderItem={renderItem}
         keyExtractor={item => "item" + item.id}
         refreshing={refreshing}
         onRefresh={() => {
-          setBeachData(data);
+          filterLocationData(filteredLocationData);
         }}
       />
     </SafeAreaView>
