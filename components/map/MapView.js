@@ -56,7 +56,7 @@ const MapsView = ({ route }) => {
             style={[styles.slide, styles.carousel]}
           >
             <View style={styles.innerSlide}>
-              {/* <TouchableNativeFeedback
+              <TouchableNativeFeedback
                 underlayColor="white"
                 onPress={closeWindow}
               >
@@ -66,7 +66,7 @@ const MapsView = ({ route }) => {
                   size={30}
                   color="red"
                 />
-              </TouchableNativeFeedback> */}
+              </TouchableNativeFeedback>
               <BeachDetailView location={locationResults} />
             </View>
           </Animatable.View>
@@ -135,6 +135,17 @@ const MapsView = ({ route }) => {
         let todaysData = data.data[0];
         let prevData = data.data[1];
 
+        if (todaysData.newCasesByPublishDate < 50) {
+          locationCovidInformation[caseInformation].colour =
+            "rgba(50, 168, 98, 0.5)";
+        } else if (
+          todaysData.newCasesByPublishDate >= 50 &&
+          todaysData.newCasesByPublishDate <= 150
+        ) {
+          locationCovidInformation[caseInformation].colour =
+            "rgba(229, 232, 51, 0.5)";
+        }
+
         todaysData.city = location.city;
         todaysData.cumDeaths28DaysByDeathDate =
           prevData.cumDeaths28DaysByDeathDate;
@@ -151,7 +162,6 @@ const MapsView = ({ route }) => {
   const MarkerLocations = () => {
     getLocationData();
     if (locationCovidInformation) {
-      // console.log("locationCovidInformation", locationCovidInformation);
       return locationCovidInformation.map(data => (
         <View key={data.id}>
           <Marker
@@ -182,7 +192,7 @@ const MapsView = ({ route }) => {
               longitude: parseFloat(data.lng)
             }}
             radius={5000}
-            fillColor="rgba(168, 50, 50, 0.5)"
+            fillColor={data.colour ? data.colour : "rgba(168, 50, 50, 0.5)"}
           />
         </View>
       ));
@@ -190,16 +200,16 @@ const MapsView = ({ route }) => {
   };
 
   const closeWindow = () => {
-    updatePolygonStrokeColour(null);
-    if (locationIsDisplayed) {
-      beachRef.current.flipOutY();
-      paginationRef.current.flipOutY();
-    }
+    console.log("touched");
+    // updatePolygonStrokeColour(null);
+    // if (locationIsDisplayed) {
+    //   beachRef.current.flipOutY();
+    //   paginationRef.current.flipOutY();
+    // }
   };
 
   const getMyLocation = () => {
     if (!location) {
-      console.log("location false");
       (async () => {
         let { status } = await Location.requestPermissionsAsync();
         if (status !== "granted") {
@@ -233,7 +243,6 @@ const MapsView = ({ route }) => {
   };
 
   useFocusEffect(() => {
-    console.log("useFocusEffect");
     getMyLocation();
 
     if (route.params) {
