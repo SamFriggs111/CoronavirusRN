@@ -14,28 +14,18 @@ const BeachFeature = props => {
       /> */}
       <Text style={styles.featureText}>
         {props.text}
-        {props.detail ? props.detail : "No data"}
+        {props.detail ? props.detail : 0}
       </Text>
     </View>
   );
 };
 
 const BeachDetailView = props => {
-  // console.log(props.location);
   return (
     <View>
       <View style={styles.titleView}>
         <Text style={styles.slideTitle}>{props.location.city}</Text>
       </View>
-      <View style={styles.sliders}></View>
-      {/* <View style={styles.warning}>
-        <FontAwesome
-          name="circle"
-          size={20}
-          color={props.location.iconColour}
-        />
-        <Text style={styles.slideSubtitle}>{props.location.congestion}</Text>
-      </View> */}
       <View style={styles.featureView}>
         <BeachFeature
           icon="toilet"

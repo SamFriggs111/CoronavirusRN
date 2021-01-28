@@ -34,12 +34,13 @@ const SearchView = ({ navigation }) => {
   const refreshing = false;
 
   const getLocationData = () => {
-    if (!filteredLocationData) {
+    if (!locations) {
       (async () => {
         let output = [];
         await firebase
           .firestore()
           .collection("locations")
+          .orderBy("city", "asc")
           .get()
           .then(querySnapshot => {
             querySnapshot.forEach(documentSnapshot => {

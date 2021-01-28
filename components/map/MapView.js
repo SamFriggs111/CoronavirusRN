@@ -132,14 +132,18 @@ const MapsView = ({ route }) => {
         let caseInformation = locationCovidInformation.findIndex(
           obj => obj.city == location.city
         );
-        let areaData = data.data[0];
-        areaData.city = location.city;
+        let todaysData = data.data[0];
+        let prevData = data.data[1];
 
-        locationCovidInformation[caseInformation].newCases =
-          areaData.newCasesByPublishDate;
+        todaysData.city = location.city;
+        todaysData.cumDeaths28DaysByDeathDate =
+          prevData.cumDeaths28DaysByDeathDate;
+
+        todaysData.newDeaths28DaysByDeathDate =
+          prevData.newDeaths28DaysByDeathDate;
 
         setLocationCovidInformation(locationCovidInformation);
-        setLocationResults(areaData);
+        setLocationResults(todaysData);
         setLocationOverlay(true);
       });
   };
@@ -236,8 +240,8 @@ const MapsView = ({ route }) => {
       setRegion({
         latitude: route.params.region.lat,
         longitude: route.params.region.lng,
-        latitudeDelta: 0.15,
-        longitudeDelta: 0.15
+        latitudeDelta: 0.2,
+        longitudeDelta: 0.2
       });
       requestData(route.params.region);
       setWelcomeMessageOverlay(false);
@@ -247,10 +251,10 @@ const MapsView = ({ route }) => {
       route.params = null;
       mapRef.current.animateToRegion(
         {
-          latitude: region.latitude,
+          latitude: region.latitude - 0.05,
           longitude: region.longitude,
-          latitudeDelta: 0.15,
-          longitudeDelta: 0.15
+          latitudeDelta: 0.2,
+          longitudeDelta: 0.2
         },
         2000
       );

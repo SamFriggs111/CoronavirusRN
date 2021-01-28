@@ -16,34 +16,21 @@ export const styles = StyleSheet.create({
     marginVertical: 15,
     borderRadius: 20
   },
-  warning: {
-    flexDirection: "row",
-    marginTop: 10,
-    borderBottomColor: "rgba(158, 150, 150, .25)",
-    borderTopColor: "rgba(158, 150, 150, .25)",
-    borderBottomWidth: 1,
-    borderTopWidth: 1,
-    height: 35,
-    alignItems: "center",
-    justifyContent: "center"
-  },
   features: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 50,
-    width: 225,
-    marginBottom: 8
-  },
-  featureIcon: {
-    width: 20,
-    textAlign: "center"
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+    width: 300,
+    marginBottom: 8,
+    justifyContent: "center"
   },
   featureView: {
     marginTop: 10
   },
   featureText: {
-    marginLeft: 5,
-    fontSize: 10
+    textAlign: "center",
+    fontSize: 13
   },
   slideImage: {
     width: windowWidth * 0.55,
@@ -51,7 +38,7 @@ export const styles = StyleSheet.create({
     borderRadius: 5
   },
   slideTitle: {
-    fontSize: 14,
+    fontSize: 20,
     marginTop: 10,
     textAlign: "center",
     textDecorationLine: "underline"
