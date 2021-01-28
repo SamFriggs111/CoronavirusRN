@@ -38,6 +38,7 @@ const MapsView = ({ route }) => {
 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [focusIsDisabled, setFocusDisabled] = useState(false);
 
   const mapRef = useRef(null);
   const beachRef = useRef(null);
@@ -116,11 +117,12 @@ const MapsView = ({ route }) => {
   const requestData = location => {
     setWelcomeMessageOverlay(false);
     setLocationResults(false);
+    setFocusDisabled(false);
     setRegion({
       latitude: location.lat,
       longitude: location.lng,
-      latitudeDelta: 0.1,
-      longitudeDelta: 0.1
+      latitudeDelta: 0.2,
+      longitudeDelta: 0.2
     });
     let url = location.areaCode
       ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${location.areaCode}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`
@@ -144,6 +146,9 @@ const MapsView = ({ route }) => {
         ) {
           locationCovidInformation[caseInformation].colour =
             "rgba(229, 232, 51, 0.5)";
+        } else {
+          locationCovidInformation[caseInformation].colour =
+            "rgba(168, 50, 50, 0.5)";
         }
 
         todaysData.city = location.city;
@@ -192,7 +197,7 @@ const MapsView = ({ route }) => {
               longitude: parseFloat(data.lng)
             }}
             radius={5000}
-            fillColor={data.colour ? data.colour : "rgba(168, 50, 50, 0.5)"}
+            fillColor={data.colour ? data.colour : "rgba(225, 230, 223, 0.5)"}
           />
         </View>
       ));
@@ -243,6 +248,9 @@ const MapsView = ({ route }) => {
   };
 
   useFocusEffect(() => {
+    // console.log("useFocusEffect");
+    // if (!focusIsDisabled || route.params) {
+    // console.log("run");
     getMyLocation();
 
     if (route.params) {
@@ -264,10 +272,14 @@ const MapsView = ({ route }) => {
           longitude: region.longitude,
           latitudeDelta: 0.2,
           longitudeDelta: 0.2
+          // latitudeDelta: region.latitudeDelta,
+          // longitudeDelta: region.longitudeDelta
         },
         2000
       );
     }
+    setFocusDisabled(true);
+    // }
   });
 
   return (
