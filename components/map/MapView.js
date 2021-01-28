@@ -213,33 +213,16 @@ const MapsView = ({ route }) => {
   const getLocationData = () => {
     if (!locationCovidInformation) {
       (async () => {
-        let output = [];
+        let locationsArr = [];
         firebase
           .firestore()
           .collection("locations")
           .get()
           .then(querySnapshot => {
-            querySnapshot.forEach(documentSnapshot => {
-              output.push(documentSnapshot.data());
-              // let url = documentSnapshot.data().areaCode
-              //   ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${
-              //       documentSnapshot.data().areaCode
-              //     }&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`
-              //   : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${
-              //       documentSnapshot.data().city
-              //     }&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`;
-
-              // fetch(url)
-              //   .then(results => results.json())
-              //   .then(data => {
-              //     let locationData = documentSnapshot.data();
-              //     locationData.newCasesByPublishDate =
-              //       data.data[0].newCasesByPublishDate;
-              //     output.push(locationData);
-              //     setLocationCovidInformation(output);
-              //   });
+            querySnapshot.forEach(location => {
+              locationsArr.push(location.data());
             });
-            setLocationCovidInformation(output);
+            setLocationCovidInformation(locationsArr);
           });
       })();
     }
@@ -249,12 +232,17 @@ const MapsView = ({ route }) => {
     console.log("useFocusEffect");
     getMyLocation();
 
-    // if (route.params) {
-    //   updatePolygonStrokeColour(route.params.region.id - 1);
-    //   setRegion(route.params.region);
-    //   setWelcomeMessageOverlay(false);
-    //   setLocationOverlay(true);
-    // }
+    if (route.params) {
+      setRegion({
+        latitude: route.params.region.lat,
+        longitude: route.params.region.lng,
+        latitudeDelta: 0.15,
+        longitudeDelta: 0.15
+      });
+      requestData(route.params.region);
+      setWelcomeMessageOverlay(false);
+      setLocationOverlay(true);
+    }
     if (mapRef.current) {
       route.params = null;
       mapRef.current.animateToRegion(
