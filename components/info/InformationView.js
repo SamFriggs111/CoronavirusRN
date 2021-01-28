@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, SafeAreaView, ScrollView } from "react-native";
+import { Text, View, Image, ScrollView } from "react-native";
 import { WebView } from "react-native-webview";
 
 import { getNoticeText, Tester } from "../../api/api.js";
@@ -21,9 +21,8 @@ const InformationView = () => {
 
   const NoticeTextView = () => {
     getInformation();
-    console.log("1");
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: covidInformation ? 1 : 0 }}>
         {covidInformation ? (
           <View style={{ flex: 1 }}>
             <Text style={[styles.textContainer, styles.title]}>
@@ -39,7 +38,11 @@ const InformationView = () => {
               source={{ html: covidInformation[4].text }}
             />
           </View>
-        ) : null}
+        ) : (
+          <View>
+            <Text style={[styles.title]}>Loading...</Text>
+          </View>
+        )}
       </View>
     );
   };
