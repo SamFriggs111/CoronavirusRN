@@ -206,8 +206,7 @@ const MapsView = ({ route }) => {
   };
 
   const closeWindow = () => {
-    console.log("touched");
-    //   locationRef.current.flipOutY();
+    locationRef.current.flipOutY();
   };
 
   const getMyLocation = () => {

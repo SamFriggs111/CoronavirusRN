@@ -47,9 +47,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center"
   },
   close: {
-    position: "absolute",
-    right: 10,
-    top: 5
+    paddingTop: 10
   },
   slideSubtitle: {
     fontSize: 12,

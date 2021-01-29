@@ -1,11 +1,12 @@
+// Initialising firebase
 import * as firebase from "firebase";
 import "firebase/firestore";
 const firebaseConfig = require("./../../config");
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
+// Imports the necessary react components
 import React, { useState } from "react";
 import { Searchbar } from "react-native-paper";
-import { FontAwesome } from "@expo/vector-icons";
 import {
   FlatList,
   View,
@@ -15,15 +16,10 @@ import {
 } from "react-native";
 import styles from "./styles";
 
-const Item = ({ title, congestionColour }) => (
+// Item component
+const Item = ({ title }) => (
   <View style={styles.item}>
     <Text style={styles.title}>{title}</Text>
-    <FontAwesome
-      style={styles.icons}
-      name="circle"
-      size={20}
-      color={congestionColour}
-    />
   </View>
 );
 
@@ -33,6 +29,7 @@ const SearchView = ({ navigation }) => {
   const [filteredLocationData, filterLocationData] = useState(null);
   const refreshing = false;
 
+  // Loads data from database
   const getLocationData = () => {
     if (!locations) {
       (async () => {
@@ -64,11 +61,9 @@ const SearchView = ({ navigation }) => {
       newData = items.filter(item => {
         const itemData = item.city.toLowerCase();
         const textData = text.toLowerCase();
-
         return itemData.indexOf(textData) > -1;
       });
     }
-
     filterLocationData(newData);
   };
 
@@ -76,7 +71,7 @@ const SearchView = ({ navigation }) => {
     <TouchableOpacity
       onPress={() => navigation.navigate("Map", { region: item })}
     >
-      <Item title={item.city} congestionColour={item.iconColour} />
+      <Item title={item.city} />
     </TouchableOpacity>
   );
 
