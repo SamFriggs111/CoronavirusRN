@@ -20,8 +20,6 @@ var db = firebase.firestore();
 let counter = 1;
 
 locations.forEach(function(obj) {
-  console.log(obj);
-  // console.log("test");
   db.collection("locations")
     .add({
       id: counter,

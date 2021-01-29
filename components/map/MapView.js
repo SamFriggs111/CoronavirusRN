@@ -46,7 +46,6 @@ const MapsView = ({ route }) => {
   ); // Stores the location data from the database
 
   const [myLocation, setMyLocation] = useState(null); // Handles state for GPS location
-  const [focusIsDisabled, setFocusDisabled] = useState(false);
 
   // References
   const mapRef = useRef(null); // For maps
@@ -87,7 +86,6 @@ const MapsView = ({ route }) => {
 
   // Component that renders when the sensors aren't ready - will appear until GPS and database data from be stored
   const SensorOverlay = () => {
-    console.log(sensorsMessageIsDisplayed);
     return (
       <View>
         {sensorsMessageIsDisplayed ? (
@@ -130,7 +128,6 @@ const MapsView = ({ route }) => {
   const requestData = location => {
     setSensorsMessageOverlay(false);
     setLocationResults(false);
-    setFocusDisabled(false);
 
     // Change of region
     setRegion({
@@ -210,11 +207,7 @@ const MapsView = ({ route }) => {
 
   const closeWindow = () => {
     console.log("touched");
-    // updatePolygonStrokeColour(null);
-    // if (locationIsDisplayed) {
     //   locationRef.current.flipOutY();
-    //   paginationRef.current.flipOutY();
-    // }
   };
 
   const getMyLocation = () => {
@@ -249,12 +242,9 @@ const MapsView = ({ route }) => {
     }
   };
 
+  // Executes on focus
   useFocusEffect(() => {
-    // console.log("useFocusEffect");
-    // if (!focusIsDisabled || route.params) {
-    // console.log("run");
     getMyLocation();
-
     if (route.params) {
       setRegion({
         latitude: route.params.region.lat,
@@ -274,14 +264,10 @@ const MapsView = ({ route }) => {
           longitude: region.longitude,
           latitudeDelta: 0.2,
           longitudeDelta: 0.2
-          // latitudeDelta: region.latitudeDelta,
-          // longitudeDelta: region.longitudeDelta
         },
         2000
       );
     }
-    setFocusDisabled(true);
-    // }
   });
 
   return (
