@@ -22,7 +22,11 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 // Imports RN maps
 import MapView, { Marker, Callout, Circle } from "react-native-maps";
 // Imports created files from components
-import { getDefaultRegion } from "../../api/api";
+import {
+  getDefaultRegion,
+  getCoronavirusUrl,
+  determineLocationColour
+} from "../../api/api";
 import LocationDetailView from "./overlay/LocationDetailView";
 
 // Remaining imports
@@ -32,28 +36,29 @@ import { styles, welcomeMessage } from "./styles";
 import * as Location from "expo-location";
 
 const MapsView = ({ route }) => {
-  const [region, setRegion] = useState(getDefaultRegion());
-  const [welcomeMesIsDisplayed, setWelcomeMessageOverlay] = useState(true);
-  const [locationIsDisplayed, setLocationOverlay] = useState(false);
-  const [locationResults, setLocationResults] = useState(false);
+  const [region, setRegion] = useState(getDefaultRegion()); // Region state
+  const [sensorsMessageIsDisplayed, setSensorsMessageOverlay] = useState(true); // Used to toggle the sensors overlay
+  const [locationIsDisplayed, setLocationOverlay] = useState(false); // Used to toggle the information overlay
+
+  const [locationResults, setLocationResults] = useState(false); // Stores the location data from the API call
   const [locationCovidInformation, setLocationCovidInformation] = useState(
     null
-  );
+  ); // Stores the location data from the database
 
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [myLocation, setMyLocation] = useState(null); // Handles state for GPS location
   const [focusIsDisabled, setFocusDisabled] = useState(false);
 
-  const mapRef = useRef(null);
-  const beachRef = useRef(null);
-  const welcomeRef = useRef(null);
+  // References
+  const mapRef = useRef(null); // For maps
+  const locationRef = useRef(null); // For location overlay
+  const welcomeRef = useRef(null); // For welcome overlay
 
   const AnimatedCard = () => {
     return (
       <View>
         {locationIsDisplayed ? (
           <Animatable.View
-            ref={beachRef}
+            ref={locationRef}
             animation="flipInY"
             iterationCount={1}
             direction="alternate"
@@ -82,7 +87,7 @@ const MapsView = ({ route }) => {
   const WelcomeViewCard = () => {
     return (
       <View>
-        {welcomeMesIsDisplayed ? (
+        {sensorsMessageIsDisplayed ? (
           <Animatable.View
             ref={welcomeRef}
             style={[styles.slide, styles.carousel]}
@@ -90,7 +95,7 @@ const MapsView = ({ route }) => {
             <View style={styles.innerSlide}>
               <View style={styles.sliders}>
                 <Text style={welcomeMessage.slideDesc}>Getting location</Text>
-                {!location ? (
+                {!myLocation ? (
                   <Image
                     source={require("./../../assets/loading.gif")}
                     style={{ width: 20, height: 20 }}
@@ -117,20 +122,23 @@ const MapsView = ({ route }) => {
     );
   };
 
+  // This function updates the information on the InformationView
+  // It also updates the necessary state
   const requestData = location => {
-    setWelcomeMessageOverlay(false);
+    setSensorsMessageOverlay(false);
     setLocationResults(false);
     setFocusDisabled(false);
+
+    // Change of region
     setRegion({
       latitude: location.lat,
-      longitude: location.lng,
-      latitudeDelta: 0.2,
-      longitudeDelta: 0.2
+      longitude: location.lng
     });
-    let url = location.areaCode
-      ? `https://api.coronavirus.data.gov.uk/v1/data?filters=areaCode=${location.areaCode}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`
-      : `https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=${location.city}&structure={"date":"date","areaName":"areaName","areaCode":"areaCode","newCasesByPublishDate":"newCasesByPublishDate","cumCasesByPublishDate":"cumCasesByPublishDate","newDeaths28DaysByDeathDate":"newDeaths28DaysByDeathDate","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}`;
 
+    // Gets url from API file
+    const url = getCoronavirusUrl(location);
+
+    // Uses the NHS api to get the required data
     fetch(url)
       .then(results => results.json())
       .then(data => {
@@ -140,19 +148,9 @@ const MapsView = ({ route }) => {
         let todaysData = data.data[0];
         let prevData = data.data[1];
 
-        if (todaysData.newCasesByPublishDate < 50) {
-          locationCovidInformation[caseInformation].colour =
-            "rgba(50, 168, 98, 0.5)";
-        } else if (
-          todaysData.newCasesByPublishDate >= 50 &&
-          todaysData.newCasesByPublishDate <= 150
-        ) {
-          locationCovidInformation[caseInformation].colour =
-            "rgba(229, 232, 51, 0.5)";
-        } else {
-          locationCovidInformation[caseInformation].colour =
-            "rgba(168, 50, 50, 0.5)";
-        }
+        locationCovidInformation[
+          caseInformation
+        ].colour = determineLocationColour(todaysData);
 
         todaysData.city = location.city;
         todaysData.cumDeaths28DaysByDeathDate =
@@ -211,21 +209,19 @@ const MapsView = ({ route }) => {
     console.log("touched");
     // updatePolygonStrokeColour(null);
     // if (locationIsDisplayed) {
-    //   beachRef.current.flipOutY();
+    //   locationRef.current.flipOutY();
     //   paginationRef.current.flipOutY();
     // }
   };
 
   const getMyLocation = () => {
-    if (!location) {
+    if (!myLocation) {
       (async () => {
         let { status } = await Location.requestPermissionsAsync();
-        if (status !== "granted") {
-          setErrorMsg("Permission to access location was denied");
-          return;
-        }
+        if (status !== "granted") return;
+
         let location = await Location.getCurrentPositionAsync({});
-        setLocation(location.coords);
+        setMyLocation(location.coords);
         setRegion(location.coords);
         welcomeRef.current.flipOutY();
       })();
@@ -264,7 +260,7 @@ const MapsView = ({ route }) => {
         longitudeDelta: 0.2
       });
       requestData(route.params.region);
-      setWelcomeMessageOverlay(false);
+      setSensorsMessageOverlay(false);
       setLocationOverlay(true);
     }
     if (mapRef.current) {
@@ -297,12 +293,12 @@ const MapsView = ({ route }) => {
         }}
         ref={mapRef}
       >
-        {location ? (
+        {myLocation ? (
           <View>
             <Marker
               coordinate={{
-                latitude: location.latitude,
-                longitude: location.longitude
+                latitude: myLocation.latitude,
+                longitude: myLocation.longitude
               }}
               pinColor={"blue"}
             >
