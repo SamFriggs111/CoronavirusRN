@@ -51,9 +51,10 @@ const MapsView = ({ route }) => {
   // References
   const mapRef = useRef(null); // For maps
   const locationRef = useRef(null); // For location overlay
-  const welcomeRef = useRef(null); // For welcome overlay
+  const sensorsRef = useRef(null); // For sensor overlay
 
-  const AnimatedCard = () => {
+  // Component that renders the location overlay - only renders if there's a location set
+  const LocationOverlay = () => {
     return (
       <View>
         {locationIsDisplayed ? (
@@ -62,7 +63,7 @@ const MapsView = ({ route }) => {
             animation="flipInY"
             iterationCount={1}
             direction="alternate"
-            style={[styles.slide, styles.carousel]}
+            style={[styles.slide, styles.overlay]}
           >
             <View style={styles.innerSlide}>
               <TouchableNativeFeedback
@@ -84,13 +85,15 @@ const MapsView = ({ route }) => {
     );
   };
 
-  const WelcomeViewCard = () => {
+  // Component that renders when the sensors aren't ready - will appear until GPS and database data from be stored
+  const SensorOverlay = () => {
+    console.log(sensorsMessageIsDisplayed);
     return (
       <View>
         {sensorsMessageIsDisplayed ? (
           <Animatable.View
-            ref={welcomeRef}
-            style={[styles.slide, styles.carousel]}
+            ref={sensorsRef}
+            style={[styles.slide, styles.overlay]}
           >
             <View style={styles.innerSlide}>
               <View style={styles.sliders}>
@@ -223,7 +226,7 @@ const MapsView = ({ route }) => {
         let location = await Location.getCurrentPositionAsync({});
         setMyLocation(location.coords);
         setRegion(location.coords);
-        welcomeRef.current.flipOutY();
+        sensorsRef.current.flipOutY();
       })();
     }
   };
@@ -312,8 +315,8 @@ const MapsView = ({ route }) => {
         ) : null}
         <MarkerLocations />
       </MapView>
-      <AnimatedCard />
-      <WelcomeViewCard />
+      <LocationOverlay />
+      <SensorOverlay />
     </SafeAreaView>
   );
 };

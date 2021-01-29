@@ -55,26 +55,7 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     marginHorizontal: 10
   },
-  pagination: {
-    position: "absolute",
-    bottom: 150,
-    width: "100%",
-    justifyContent: "center",
-    flexDirection: "row"
-  },
-  paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 2
-  },
-  paginationDotActive: {
-    backgroundColor: "white"
-  },
-  paginationDotInactive: {
-    backgroundColor: "gray"
-  },
-  carousel: {
+  overlay: {
     position: "absolute",
     bottom: 160
   },
