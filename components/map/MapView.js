@@ -1,11 +1,14 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
+// Fixing known bug in RN
 require("./../../fix-timer-bug");
 
+// Initialising firebase
 import * as firebase from "firebase";
 import "firebase/firestore";
 const firebaseConfig = require("./../../config");
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
+// Imports the necessary react components
 import {
   View,
   TouchableNativeFeedback,
@@ -13,18 +16,19 @@ import {
   Text,
   Image
 } from "react-native";
-import { Ionicons, AntDesign, MaterialIcons } from "@expo/vector-icons";
-import MapView, { Polygon, Marker, Callout, Circle } from "react-native-maps";
-import {
-  getLocationsData,
-  getDefaultRegion,
-  getCongestion
-} from "../../api/api";
+
+// Imports icons
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+// Imports RN maps
+import MapView, { Marker, Callout, Circle } from "react-native-maps";
+// Imports created files from components
+import { getDefaultRegion } from "../../api/api";
+import LocationDetailView from "./overlay/LocationDetailView";
+
+// Remaining imports
 import { useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 import { styles, welcomeMessage } from "./styles";
-import BeachDetailView from "./overlay/BeachDetailView";
-import WelcomeDetailView from "./overlay/WelcomeDetailView";
 import * as Location from "expo-location";
 
 const MapsView = ({ route }) => {
@@ -67,7 +71,7 @@ const MapsView = ({ route }) => {
                   color="red"
                 />
               </TouchableNativeFeedback>
-              <BeachDetailView location={locationResults} />
+              <LocationDetailView location={locationResults} />
             </View>
           </Animatable.View>
         ) : null}

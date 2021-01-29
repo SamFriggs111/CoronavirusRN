@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 
+// Necessary styles for information tab
 const styles = StyleSheet.create({
   title: {
     justifyContent: "center",
