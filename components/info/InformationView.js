@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Text, View, Image, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { Text, View } from "react-native";
 import { WebView } from "react-native-webview";
-
-import { getNoticeText, Tester } from "../../api/api.js";
 import styles from "./styles";
 
 const InformationView = () => {
